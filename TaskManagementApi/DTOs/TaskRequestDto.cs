@@ -24,6 +24,6 @@ namespace TaskManagementApi.DTOs
 
 
         [Required(ErrorMessage = "DueDate is required")]
-        public DateTime DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

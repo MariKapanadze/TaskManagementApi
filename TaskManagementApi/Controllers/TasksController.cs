@@ -32,7 +32,7 @@ public class TasksController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TaskItem>> Create(TaskRequestDto dto)
     {
-        if(dto.DueDate.Date < DateTime.UtcNow.Date)
+        if(dto.DueDate!.Value.Date < DateTime.UtcNow.Date)
         {
            ModelState.AddModelError(nameof(dto.DueDate), "Due date cannot be in the past.");
             return ValidationProblem(ModelState);
@@ -45,7 +45,7 @@ public class TasksController : ControllerBase
             Status = dto.Status,
             AssignedTo = dto.AssignedTo,
             CreatedAt = DateTime.UtcNow,
-            DueDate = dto.DueDate
+            DueDate = dto.DueDate.Value
         };
 
         _db.Tasks.Add(task);
@@ -59,7 +59,12 @@ public class TasksController : ControllerBase
         var task = await _db.Tasks.FindAsync(id);
         if (task is null) return NotFoundProblem(id);
 
-        _db.Tasks.Remove(task);
+        task.Title = dto.Title;
+        task.Description = dto.Description;
+        task.Status = dto.Status;
+        task.AssignedTo = dto.AssignedTo;
+        task.DueDate = dto.DueDate!.Value;
+
         await _db.SaveChangesAsync();
         return NoContent();
     }
